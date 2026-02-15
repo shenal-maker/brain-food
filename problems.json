@@ -1,0 +1,20 @@
+[
+  {"video": 0, "topic": "Vectors", "q": "What is [2,3] + [1,-1]?", "opts": ["[3,2]","[2,2]","[1,4]"], "a": 0, "exp": "Add component-wise: [2+1, 3-1] = [3,2]"},
+  {"video": 0, "topic": "Vectors", "q": "What is 3 × [2,1]?", "opts": ["[6,3]","[5,4]","[6,1]"], "a": 0, "exp": "Multiply each component: [3×2, 3×1] = [6,3]"},
+  {"video": 0, "topic": "Vectors", "q": "A vector [4,0] points in which direction?", "opts": ["Along x-axis","Along y-axis","Diagonal"], "a": 0, "exp": "y=0 means purely horizontal"},
+  {"video": 1, "topic": "Linear combinations", "q": "What is 2[1,0] + 3[0,1]?", "opts": ["[2,3]","[3,2]","[5,0]"], "a": 0, "exp": "2[1,0]=[2,0], 3[0,1]=[0,3], sum=[2,3]"},
+  {"video": 1, "topic": "Linear combinations", "q": "Can [1,0] and [2,0] span all of R²?", "opts": ["No","Yes","Only if scaled"], "a": 0, "exp": "They point in the same direction — only span a line"},
+  {"video": 1, "topic": "Linear combinations", "q": "Two vectors are linearly independent if:", "opts": ["Neither is a scalar multiple of the other","They are perpendicular","They have equal length"], "a": 0, "exp": "Independence means you can't make one from the other by scaling"},
+  {"video": 2, "topic": "Linear transformations", "q": "A linear transformation must preserve:", "opts": ["Lines and origin","Angles","Distances"], "a": 0, "exp": "Lines stay lines, origin stays fixed"},
+  {"video": 2, "topic": "Linear transformations", "q": "A 2×2 matrix represents a transformation of:", "opts": ["2D space","3D space","1D space"], "a": 0, "exp": "2 columns = 2D input, 2 rows = 2D output"},
+  {"video": 3, "topic": "Matrix multiplication", "q": "If A then B, the combined matrix is:", "opts": ["BA","AB","A+B"], "a": 0, "exp": "Right-to-left: apply A first, then B, so BA"},
+  {"video": 3, "topic": "Matrix multiplication", "q": "Is matrix multiplication commutative (AB = BA)?", "opts": ["No, generally not","Yes, always","Only for square matrices"], "a": 0, "exp": "Order matters — AB ≠ BA in general"},
+  {"video": 5, "topic": "Determinants", "q": "A determinant of 0 means:", "opts": ["Space is squished to lower dimension","No transformation","Space is doubled"], "a": 0, "exp": "det=0 means the transformation collapses a dimension"},
+  {"video": 5, "topic": "Determinants", "q": "A negative determinant means:", "opts": ["Orientation is flipped","Transformation is invalid","Space is shrunk"], "a": 0, "exp": "Negative det = orientation reversal (like flipping a page)"},
+  {"video": 6, "topic": "Inverse matrices", "q": "A⁻¹A equals:", "opts": ["Identity matrix","Zero matrix","A²"], "a": 0, "exp": "Inverse undoes the transformation, returning to identity"},
+  {"video": 6, "topic": "Inverse matrices", "q": "When does A⁻¹ NOT exist?", "opts": ["When det(A) = 0","When A is square","When A has negatives"], "a": 0, "exp": "Can't undo a transformation that squishes to lower dimension"},
+  {"video": 8, "topic": "Dot products", "q": "[1,2] · [3,4] = ?", "opts": ["11","7","14"], "a": 0, "exp": "1×3 + 2×4 = 3+8 = 11"},
+  {"video": 8, "topic": "Dot products", "q": "If the dot product of two vectors is 0, they are:", "opts": ["Perpendicular","Parallel","Equal"], "a": 0, "exp": "Zero dot product = 90° angle between vectors"},
+  {"video": 13, "topic": "Eigenvalues", "q": "An eigenvector is a vector that, after transformation:", "opts": ["Stays on its own span (only scaled)","Doesn't change at all","Rotates 90°"], "a": 0, "exp": "Eigenvectors only get scaled, not knocked off their line"},
+  {"video": 13, "topic": "Eigenvalues", "q": "The eigenvalue represents:", "opts": ["How much the eigenvector is scaled","The angle of rotation","The determinant"], "a": 0, "exp": "λ is the scaling factor for that eigenvector"}
+]

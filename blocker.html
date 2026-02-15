@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Brain Food</title>
+  <link rel="stylesheet" href="blocker.css">
+</head>
+<body>
+  <h1>Brain Food</h1>
+  <p class="subtitle">Complete your exercise to unlock browsing</p>
+
+  <div class="xp-bar">
+    <div class="label"><span id="xp-text">0 XP</span><span id="streak-text">0 day streak</span></div>
+    <div class="track"><div class="fill" id="xp-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="timer" id="timer">10:00</div>
+
+  <!-- Video Section -->
+  <div class="section" id="video-section">
+    <h2 id="video-title">Loading video...</h2>
+    <div class="video-container">
+      <iframe id="video-frame" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- Math Problems -->
+  <div class="section" id="math-section">
+    <h2>Math Problems</h2>
+    <div id="problems-container"></div>
+  </div>
+
+  <!-- Personal Challenge -->
+  <div class="section" id="challenge-section">
+    <h2>Personal Challenge</h2>
+    <div id="challenge-container"></div>
+  </div>
+
+  <button class="btn" id="submit-btn" disabled>Complete Exercise</button>
+  <div id="result"></div>
+
+  <script src="blocker.js"></script>
+</body>
+</html>

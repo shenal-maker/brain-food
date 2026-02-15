@@ -1,0 +1,98 @@
+[
+  {
+    "index": 0,
+    "title": "Vectors, what even are they?",
+    "videoId": "fNk_zzcIR7s",
+    "topic": "Vectors"
+  },
+  {
+    "index": 1,
+    "title": "Linear combinations, span, and basis vectors",
+    "videoId": "k7RM-ot2NWY",
+    "topic": "Linear combinations"
+  },
+  {
+    "index": 2,
+    "title": "Linear transformations and matrices",
+    "videoId": "kYB8IZa5AuE",
+    "topic": "Linear transformations"
+  },
+  {
+    "index": 3,
+    "title": "Matrix multiplication as composition",
+    "videoId": "XkY2DOUCWMU",
+    "topic": "Matrix multiplication"
+  },
+  {
+    "index": 4,
+    "title": "Three-dimensional linear transformations",
+    "videoId": "rHLEWRxRGiM",
+    "topic": "3D transformations"
+  },
+  {
+    "index": 5,
+    "title": "The determinant",
+    "videoId": "Ip3X9LOh2dk",
+    "topic": "Determinants"
+  },
+  {
+    "index": 6,
+    "title": "Inverse matrices, column space and null space",
+    "videoId": "uQhTuRlWMxw",
+    "topic": "Inverse matrices"
+  },
+  {
+    "index": 7,
+    "title": "Nonsquare matrices as transformations",
+    "videoId": "v8VSDg_WQlA",
+    "topic": "Nonsquare matrices"
+  },
+  {
+    "index": 8,
+    "title": "Dot products and duality",
+    "videoId": "LyGKycYT2v0",
+    "topic": "Dot products"
+  },
+  {
+    "index": 9,
+    "title": "Cross products",
+    "videoId": "eu6i7WJeinw",
+    "topic": "Cross products"
+  },
+  {
+    "index": 10,
+    "title": "Cross products in the light of linear transformations",
+    "videoId": "BaM7OCEm3G0",
+    "topic": "Cross products extended"
+  },
+  {
+    "index": 11,
+    "title": "Cramer's rule, explained geometrically",
+    "videoId": "jBsC34PxzoM",
+    "topic": "Cramer's rule"
+  },
+  {
+    "index": 12,
+    "title": "Change of basis",
+    "videoId": "P2LTAUO1TdA",
+    "topic": "Change of basis"
+  },
+  {
+    "index": 13,
+    "title": "Eigenvectors and eigenvalues",
+    "videoId": "PFDu9oVAE1g",
+    "topic": "Eigenvalues"
+  },
+  {
+    "index": 14,
+    "title": "A quick trick for computing eigenvalues",
+    "videoId": "e50Bj7jn9IQ",
+    "topic": "Eigenvalue computation"
+  },
+  {
+    "index": 15,
+    "title": "Abstract vector spaces",
+    "videoId": "TgKwz5Ikpc8",
+    "topic": "Abstract vector spaces"
+  }
+]
