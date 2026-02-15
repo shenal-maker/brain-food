@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Brain Food — Quiz</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#46178f; color:#fff; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; overflow-x:hidden; }
+    .top-bar { width:100%; padding:16px 24px; display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2); }
+    .top-bar .set-name { font-size:0.85rem; opacity:0.8; }
+    .score-display { font-size:1.3rem; font-weight:700; }
+    .streak-badge { background:#ff3355; padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:700; display:none; }
+    .streak-badge.show { display:inline-block; animation:pop 0.3s ease; }
+    @keyframes pop { 0%{transform:scale(0.5)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+    /* Set selector */
+    .set-selector { padding:3rem 2rem; text-align:center; width:100%; max-width:700px; }
+    .set-selector h1 { font-size:2.2rem; margin-bottom:0.5rem; }
+    .set-selector p { opacity:0.7; margin-bottom:2rem; }
+    .set-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .set-card { background:rgba(255,255,255,0.15); border-radius:12px; padding:16px; cursor:pointer; text-align:left; transition:transform 0.15s,background 0.15s; border:2px solid transparent; }
+    .set-card:hover { background:rgba(255,255,255,0.25); transform:translateY(-2px); }
+    .set-card h3 { font-size:0.95rem; margin-bottom:4px; }
+    .set-card .meta { font-size:0.75rem; opacity:0.6; }
+    .set-card .best { font-size:0.75rem; color:#ffd700; margin-top:4px; }
+
+    /* Question area */
+    .quiz-area { display:none; width:100%; max-width:700px; padding:1.5rem; flex:1; }
+    .timer-bar { width:100%; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; margin-bottom:1.5rem; overflow:hidden; }
+    .timer-bar .fill { height:100%; background:#fff; border-radius:4px; transition:width 0.1s linear; }
+    .q-counter { text-align:center; font-size:0.85rem; opacity:0.7; margin-bottom:0.5rem; }
+    .question-text { text-align:center; font-size:1.3rem; font-weight:700; margin-bottom:1.5rem; min-height:3rem; line-height:1.4; }
+    .answers { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .answer-btn { padding:20px 16px; border-radius:12px; border:none; color:#fff; font-size:1rem; font-weight:600; cursor:pointer; text-align:center; transition:transform 0.1s,opacity 0.2s; min-height:70px; display:flex; align-items:center; justify-content:center; }
+    .answer-btn:hover { transform:scale(1.03); }
+    .answer-btn:active { transform:scale(0.97); }
+    .answer-btn.a0 { background:#e21b3c; }
+    .answer-btn.a1 { background:#1368ce; }
+    .answer-btn.a2 { background:#d89e00; }
+    .answer-btn.disabled { pointer-events:none; opacity:0.4; }
+    .answer-btn.correct { opacity:1 !important; animation:pulse 0.5s ease; }
+    .answer-btn.wrong { opacity:0.3 !important; }
+    @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
+
+    .explanation { background:rgba(0,0,0,0.3); border-radius:12px; padding:16px; margin-top:1rem; font-size:0.9rem; line-height:1.5; display:none; }
+    .explanation.show { display:block; animation:fadeIn 0.3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+    .points-popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-size:3rem; font-weight:900; pointer-events:none; opacity:0; z-index:100; }
+    .points-popup.show { animation:pointsAnim 1s ease forwards; }
+    @keyframes pointsAnim { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)} 20%{opacity:1;transform:translate(-50%,-50%) scale(1.2)} 40%{transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-80%) scale(1)} }
+
+    .next-btn { display:none; margin-top:1rem; background:#fff; color:#46178f; border:none; padding:14px 40px; font-size:1rem; font-weight:700; border-radius:8px; cursor:pointer; }
+    .next-btn:hover { background:#e0e0e0; }
+
+    /* Results */
+    .results { display:none; text-align:center; padding:3rem 2rem; width:100%; max-width:600px; }
+    .results h1 { font-size:2.5rem; margin-bottom:0.5rem; }
+    .results .final-score { font-size:4rem; font-weight:900; color:#ffd700; margin:1rem 0; }
+    .results .detail { font-size:1rem; opacity:0.8; margin-bottom:2rem; }
+    .results button { background:#fff; color:#46178f; border:none; padding:14px 40px; font-size:1rem; font-weight:700; border-radius:8px; cursor:pointer; margin:6px; }
+
+    canvas#confetti { position:fixed; inset:0; pointer-events:none; z-index:200; }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="points-popup" id="points-popup"></div>
+
+  <div class="top-bar">
+    <span class="set-name" id="set-name"></span>
+    <span class="streak-badge" id="streak-badge"></span>
+    <span class="score-display" id="score-display">0</span>
+  </div>
+
+  <div class="set-selector" id="set-selector"></div>
+  <div class="quiz-area" id="quiz-area">
+    <div class="timer-bar"><div class="fill" id="timer-fill"></div></div>
+    <div class="q-counter" id="q-counter"></div>
+    <div class="question-text" id="question-text"></div>
+    <div class="answers" id="answers"></div>
+    <div class="explanation" id="explanation"></div>
+    <button class="next-btn" id="next-btn">Next</button>
+  </div>
+  <div class="results" id="results"></div>
+
+  <script src="quiz.js"></script>
+</body>
+</html>

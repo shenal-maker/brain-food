@@ -1,0 +1,712 @@
+{
+  "title": "Large Language Models Training - Comprehensive Quiz",
+  "description": "10 topic-based question sets covering the entire LLM training pipeline from pre-training to deployment",
+  "instructions_for_claude_code": {
+    "overview": "This quiz file contains 10 sets of questions testing understanding of how Large Language Models are trained. Each set focuses on a specific topic and should be completed after watching the corresponding section of the video.",
+    "usage": "You can use this file to create an interactive quiz application, flashcard system, or study tool. Each question has 3 options with one correct answer and an explanation.",
+    "format": {
+      "q": "The question text",
+      "opts": ["Array of exactly 3 option strings"],
+      "a": "Index of correct answer (0, 1, or 2)",
+      "exp": "Explanation of why the answer is correct"
+    },
+    "suggested_implementations": [
+      "Build a CLI quiz app that presents questions sequentially",
+      "Create a web-based quiz with score tracking",
+      "Generate flashcards from the questions",
+      "Build a spaced repetition system",
+      "Create a progress tracker showing mastery per topic"
+    ]
+  },
+  "sets": [
+    {
+      "set_number": 1,
+      "title": "Introduction & Pre-training Stage",
+      "topics": ["LLM training pipeline overview", "Internet data collection", "Common Crawl", "Fine Web dataset", "Data filtering and processing"],
+      "watch_before": "Complete this set after understanding the pre-training stage basics",
+      "questions": [
+        {
+          "q": "What are the three major stages of training large language models in order?",
+          "opts": ["Pre-training, Inference, Post-training", "Pre-training, Supervised Fine-tuning, Reinforcement Learning", "Data Collection, Model Training, Deployment"],
+          "a": 1,
+          "exp": "The three major sequential stages are: (1) Pre-training - training on internet documents, (2) Supervised Fine-tuning (SFT) - training on conversations to create an assistant, and (3) Reinforcement Learning - practice and refinement through trial and error."
+        },
+        {
+          "q": "What is the primary output of the pre-training stage?",
+          "opts": ["An AI assistant that can answer questions", "A base model that simulates internet documents", "A reward model for scoring responses"],
+          "a": 1,
+          "exp": "Pre-training produces a 'base model' - essentially an internet document simulator. It can generate text that statistically resembles internet documents but is NOT yet an assistant. The assistant capabilities come from post-training stages."
+        },
+        {
+          "q": "Approximately how much disk space does the Fine Web dataset occupy?",
+          "opts": ["440 terabytes", "44 terabytes", "4.4 gigabytes"],
+          "a": 1,
+          "exp": "The Fine Web dataset is approximately 44 terabytes. Despite the internet being massive, aggressive filtering and working with text (not video/images) results in a manageable dataset that could almost fit on a single hard drive."
+        },
+        {
+          "q": "What organization has been systematically crawling and indexing the internet since 2007?",
+          "opts": ["Internet Archive", "Common Crawl", "Google Web Index"],
+          "a": 1,
+          "exp": "Common Crawl has been indexing the internet since 2007. As of 2024, they had indexed 2.7 billion web pages. This raw data serves as the starting point for most LLM training datasets."
+        },
+        {
+          "q": "Which of the following is NOT a filtering step mentioned for Common Crawl data?",
+          "opts": ["URL filtering to block spam and malware sites", "Manual review of every web page by humans", "Language filtering to keep primarily English content"],
+          "a": 1,
+          "exp": "The pipeline includes URL filtering, text extraction, language filtering, deduplication, and PII removal - all automated. Manual review of billions of pages is not feasible."
+        },
+        {
+          "q": "What does 'text extraction' refer to in the data processing pipeline?",
+          "opts": ["Downloading text from websites", "Removing HTML markup and keeping only the actual text content", "Translating text to English"],
+          "a": 1,
+          "exp": "Text extraction removes HTML tags, CSS, JavaScript, and navigation elements from raw web pages, keeping only the meaningful text content. This is necessary because crawlers save raw HTML."
+        },
+        {
+          "q": "Why might a language model trained on Fine Web (65%+ English filter) not perform well in Spanish?",
+          "opts": ["The model is programmed to only understand English", "The model hasn't seen much Spanish text during training", "Spanish uses different characters that models can't process"],
+          "a": 1,
+          "exp": "Models learn statistical patterns from their training data. If Fine Web filters out most non-English content, the model won't have seen many Spanish examples and thus won't learn Spanish patterns well. This is a design decision - different providers can choose different language distributions."
+        },
+        {
+          "q": "What does PII stand for in the context of data filtering?",
+          "opts": ["Public Internet Information", "Personally Identifiable Information", "Pre-processed Input Index"],
+          "a": 1,
+          "exp": "PII stands for Personally Identifiable Information - things like addresses, Social Security numbers, phone numbers. These are detected and filtered from training data to protect privacy."
+        },
+        {
+          "q": "Approximately how many tokens are in the Fine Web dataset?",
+          "opts": ["15 billion tokens", "150 billion tokens", "15 trillion tokens"],
+          "a": 2,
+          "exp": "Fine Web contains approximately 15 trillion tokens. This is the tokenized version of the 44 terabytes of text data. For context, GPT-2 was trained on only 100 billion tokens."
+        },
+        {
+          "q": "What is the main purpose of having diverse, high-quality documents in the training dataset?",
+          "opts": ["To make the dataset larger and more expensive", "To ensure the model has broad knowledge across many topics", "To prevent the model from memorizing the data"],
+          "a": 1,
+          "exp": "Large diversity of high-quality documents ensures the model learns broad knowledge across many domains. The model internalizes patterns from diverse sources, making it knowledgeable about many topics rather than specialized in just one area."
+        }
+      ]
+    },
+    {
+      "set_number": 2,
+      "title": "Tokenization",
+      "topics": ["From text to tokens", "Bytes and encoding", "Byte Pair Encoding (BPE)", "GPT-4 tokenizer", "Vocabulary size"],
+      "watch_before": "Complete this set after understanding how text is converted to tokens",
+      "questions": [
+        {
+          "q": "Why do language models use tokens instead of raw text characters?",
+          "opts": ["Tokens are easier for humans to read", "Tokens balance sequence length with vocabulary size", "Tokens make the model run faster on GPUs"],
+          "a": 1,
+          "exp": "Tokens represent a trade-off: sequence length is a finite, precious resource in neural networks. Using individual characters creates very long sequences. Tokens compress sequences to manageable lengths while keeping vocabulary finite (e.g., ~100K tokens for GPT-4)."
+        },
+        {
+          "q": "How many possible symbols exist when using bytes (8 bits grouped together) as the encoding?",
+          "opts": ["128 symbols", "256 symbols", "512 symbols"],
+          "a": 1,
+          "exp": "8 bits can be on or off in 2^8 = 256 different combinations, giving us 256 possible byte values (0-255). This is 8x shorter than bit sequences but still too long for efficient LLM processing."
+        },
+        {
+          "q": "What is the vocabulary size (number of possible tokens) for GPT-4?",
+          "opts": ["50,257 tokens", "100,277 tokens", "1,000,000 tokens"],
+          "a": 1,
+          "exp": "GPT-4 uses 100,277 possible tokens. This is the result of running Byte Pair Encoding to compress sequences. Different models use different vocabulary sizes, but ~100K is common for modern LLMs."
+        },
+        {
+          "q": "In Byte Pair Encoding (BPE), what happens when a frequently occurring pair of symbols is found?",
+          "opts": ["The pair is removed from the dataset", "A new token ID is minted to represent that pair", "The pair is marked as important for prediction"],
+          "a": 1,
+          "exp": "BPE iteratively finds common consecutive symbol pairs and creates (mints) new tokens to represent them. For example, if bytes 116+32 occur often, they become a single token 256. This process repeats until reaching the desired vocabulary size."
+        },
+        {
+          "q": "How many tokens does 'hello world' (with a space) become in GPT-4?",
+          "opts": ["One token", "Two tokens", "Three tokens"],
+          "a": 1,
+          "exp": "In GPT-4's tokenizer, 'hello world' becomes exactly two tokens: token 15339 ('hello') and token 1917 (' world' with the space). Tokenization is case-sensitive and space-sensitive."
+        },
+        {
+          "q": "What happens to the tokenization of 'Hello world' (capital H) compared to 'hello world'?",
+          "opts": ["It stays the same - capitalization doesn't matter", "It becomes different tokens", "It becomes one token instead of two"],
+          "a": 1,
+          "exp": "Tokenization is case-sensitive. 'Hello' with capital H becomes different tokens than 'hello' with lowercase h. Even small changes in text can result in different tokenization."
+        },
+        {
+          "q": "What website can you use to explore how GPT-4 tokenizes text?",
+          "opts": ["tokenizer.openai.com", "tiktokenizer", "gpt4tokens.com"],
+          "a": 1,
+          "exp": "The website 'tiktokenizer' (shown in the video) allows you to input text and see how it gets tokenized by different models including GPT-4's cl100k_base tokenizer."
+        },
+        {
+          "q": "Why is sequence length considered a 'finite and precious resource' in language models?",
+          "opts": ["Longer sequences cost more money to process", "Processing very long sequences is computationally expensive", "Models can only remember the last few tokens"],
+          "a": 1,
+          "exp": "Processing very long token sequences is computationally expensive. Models have a maximum context length (e.g., 8,000 tokens) beyond which they cannot process. This is why we compress text into tokens - to fit more information into limited sequence length."
+        },
+        {
+          "q": "What is the relationship between vocabulary size and sequence length in tokenization?",
+          "opts": ["Both always increase together", "As vocabulary size increases, sequence length decreases", "They are unrelated"],
+          "a": 1,
+          "exp": "There's a trade-off: larger vocabulary (more tokens) means each token can represent more information, resulting in shorter sequences. Smaller vocabulary means longer sequences needed to represent the same text."
+        },
+        {
+          "q": "What does it mean that tokens are 'atoms of text chunks'?",
+          "opts": ["Tokens are the smallest unit of meaning in language", "Tokens are the fundamental units that the model works with", "Tokens cannot be broken down further"],
+          "a": 1,
+          "exp": "Tokens are the fundamental, indivisible units that language models operate on. The model sees the world as sequences of token IDs (numbers), not as individual characters or words. Everything is converted to/from tokens."
+        }
+      ]
+    },
+    {
+      "set_number": 3,
+      "title": "Neural Network Training & Architecture",
+      "topics": ["Neural network basics", "Parameters/weights", "Training process", "Transformer architecture", "Forward pass and computation"],
+      "watch_before": "Complete this set after understanding how neural networks are trained",
+      "questions": [
+        {
+          "q": "What are the 'parameters' or 'weights' of a neural network?",
+          "opts": ["The input tokens fed into the model", "The knobs/settings that get adjusted during training", "The output predictions of the model"],
+          "a": 1,
+          "exp": "Parameters (or weights) are like knobs on a DJ set - they're the settings of the neural network that get adjusted during training. Modern LLMs have billions of these parameters that determine how the network transforms inputs to outputs."
+        },
+        {
+          "q": "How are neural network parameters initialized at the very beginning of training?",
+          "opts": ["They are set to optimal values from research", "They are randomly initialized", "They are copied from a previous model"],
+          "a": 1,
+          "exp": "At the start of training, parameters are randomly initialized. With random settings, the model makes random predictions. Through iterative training, these parameters get adjusted to make better predictions that match the training data."
+        },
+        {
+          "q": "What does the neural network output for each input token sequence during training?",
+          "opts": ["A single number representing quality", "A probability distribution over all possible next tokens", "The correct next token"],
+          "a": 1,
+          "exp": "The network outputs probabilities for every possible token (e.g., 100,277 probabilities for GPT-4). These represent how likely each token is to come next. Training adjusts parameters so the correct token gets higher probability."
+        },
+        {
+          "q": "What is the name of the neural network architecture used in modern LLMs like GPT?",
+          "opts": ["Convolutional Neural Network", "Transformer", "Recurrent Neural Network"],
+          "a": 1,
+          "exp": "The Transformer is the neural network architecture used in modern LLMs. It was introduced in 2017 and has become the standard. GPT-2, GPT-4, LLaMA, and most modern LLMs are all Transformers."
+        },
+        {
+          "q": "Approximately how many parameters did GPT-2 have?",
+          "opts": ["1.6 million parameters", "1.6 billion parameters", "1.6 trillion parameters"],
+          "a": 1,
+          "exp": "GPT-2 had 1.6 billion parameters (published in 2019). Modern models like GPT-4 likely have hundreds of billions or even approaching a trillion parameters - the field has scaled dramatically."
+        },
+        {
+          "q": "What happens during one 'update' or 'step' of neural network training?",
+          "opts": ["The model generates one token", "The model's parameters are adjusted to improve predictions on a batch of tokens", "The model is tested on new data"],
+          "a": 1,
+          "exp": "Each training step involves: (1) making predictions on a batch of tokens, (2) comparing predictions to correct answers, (3) mathematically calculating how to adjust parameters, (4) updating parameters to improve predictions. This happens millions of times."
+        },
+        {
+          "q": "What are the basic mathematical operations inside a Transformer neural network?",
+          "opts": ["Only addition and multiplication", "Matrix multiplications, additions, exponentials, and other simple operations", "Complex quantum computations"],
+          "a": 1,
+          "exp": "Despite seeming magical, Transformers use simple mathematical operations: matrix multiplications, additions, exponentials, divisions, layer norms, softmax, etc. The complexity comes from combining billions of these simple operations, not from any single complex operation."
+        },
+        {
+          "q": "What does 'training a neural network' fundamentally mean?",
+          "opts": ["Teaching the network to think like a human", "Finding a good setting of parameters that makes predictions match training data", "Programming specific rules into the network"],
+          "a": 1,
+          "exp": "Training means iteratively adjusting the billions of parameters to find a configuration where the network's predictions are statistically consistent with the training data patterns. There's no explicit programming - it's optimization through examples."
+        },
+        {
+          "q": "Why can you think of neural network parameters as a 'lossy compression' of the internet?",
+          "opts": ["The parameters take up less space than the original data", "The parameters store patterns from internet data but not the exact text", "The parameters are compressed using standard compression algorithms"],
+          "a": 1,
+          "exp": "The billions of parameters store statistical patterns learned from internet text, not the text itself. It's lossy compression: you can't perfectly reconstruct the training data, but you capture its statistical essence in a much smaller space."
+        },
+        {
+          "q": "What is a 'forward pass' through the neural network?",
+          "opts": ["Moving to the next token in the sequence", "Feeding input tokens through the network to get output predictions", "Updating the parameters during training"],
+          "a": 1,
+          "exp": "A forward pass means taking input tokens, feeding them through all the layers of the network (following the mathematical operations), and getting output predictions. This happens both during training and inference."
+        }
+      ]
+    },
+    {
+      "set_number": 4,
+      "title": "Inference & Base Models",
+      "topics": ["Generating from models", "Sampling process", "Base model behavior", "Prompting strategies", "Model capabilities and limitations"],
+      "watch_before": "Complete this set after understanding how models generate text and what base models do",
+      "questions": [
+        {
+          "q": "What is 'inference' in the context of language models?",
+          "opts": ["Training the model on new data", "Generating new text from a trained model", "Analyzing what the model has learned"],
+          "a": 1,
+          "exp": "Inference is the process of generating new data from a trained model. The parameters are fixed (no more training), and you feed in tokens to get predictions and sample new tokens. This is what happens when you use ChatGPT."
+        },
+        {
+          "q": "How does a language model generate the next token during inference?",
+          "opts": ["It picks the most probable token every time", "It samples from a probability distribution over possible tokens", "It randomly picks any token"],
+          "a": 1,
+          "exp": "The model outputs a probability distribution, then samples from it (like flipping a biased coin). High-probability tokens are more likely but not guaranteed. This randomness is why you get different outputs for the same input."
+        },
+        {
+          "q": "Why are language models called 'stochastic' systems?",
+          "opts": ["They use sophisticated algorithms", "They involve randomness through sampling", "They can store information over time"],
+          "a": 1,
+          "exp": "Stochastic means involving randomness. At each token, we sample from probabilities, so the same input can produce different outputs. This is why regenerating a response in ChatGPT gives different results."
+        },
+        {
+          "q": "What does a base model (before post-training) primarily do?",
+          "opts": ["Answer questions helpfully", "Continue/simulate internet document text", "Refuse harmful requests"],
+          "a": 1,
+          "exp": "A base model is an internet document simulator. It continues token sequences based on statistical patterns from its training data. It's NOT yet an assistant - it won't answer questions, it will just continue the text as if it were an internet document."
+        },
+        {
+          "q": "If you ask a base model 'What is 2+2?', what will it likely do?",
+          "opts": ["Answer '4' directly", "Continue the text as if it's part of an internet document", "Refuse to answer"],
+          "a": 1,
+          "exp": "Base models don't answer questions - they continue patterns. 'What is 2+2?' might be followed by more questions (as in a FAQ page), or other internet-style continuations. Only post-trained assistant models answer questions directly."
+        },
+        {
+          "q": "What does 'regurgitation' mean in the context of language models?",
+          "opts": ["The model generates nonsensical text", "The model reproduces training data verbatim from memory", "The model refuses to answer"],
+          "a": 1,
+          "exp": "Regurgitation is when a model recites training data word-for-word. This happens when the model has seen certain high-quality sources (like Wikipedia) many times during training, essentially memorizing them."
+        },
+        {
+          "q": "What is 'in-context learning' or 'few-shot prompting'?",
+          "opts": ["Training the model on new examples", "Providing examples in the prompt so the model learns the pattern and continues it", "Teaching the model a new language"],
+          "a": 1,
+          "exp": "In-context learning means the model learns from examples in the prompt itself (the context window). For example, showing English-Korean word pairs, then asking for a new translation. The model picks up the pattern without parameter updates."
+        },
+        {
+          "q": "What was GPT-2's maximum context length?",
+          "opts": ["1,024 tokens", "8,192 tokens", "128,000 tokens"],
+          "a": 0,
+          "exp": "GPT-2 had a maximum context length of 1,024 tokens. Modern models have much longer contexts (e.g., 128K, 200K, or even 1 million tokens), allowing them to process much more information at once."
+        },
+        {
+          "q": "If a base model is asked about events after its knowledge cutoff date, what happens?",
+          "opts": ["It says 'I don't know'", "It makes educated guesses/hallucinates based on its knowledge", "It searches the internet"],
+          "a": 1,
+          "exp": "Base models continue token sequences based on their knowledge. For post-cutoff events, they'll generate plausible-sounding text based on patterns they learned, essentially hallucinating parallel universes or educated guesses."
+        },
+        {
+          "q": "How can you make a base model act somewhat like an assistant without post-training?",
+          "opts": ["You cannot - it's impossible", "Create a prompt that looks like a conversation between human and helpful assistant", "Ask it very politely"],
+          "a": 1,
+          "exp": "You can craft a prompt structured as a conversation (with examples of human-assistant exchanges), then end with your question. The base model will continue this pattern, role-playing the assistant - but this is less reliable than actual post-training."
+        }
+      ]
+    },
+    {
+      "set_number": 5,
+      "title": "Supervised Fine-Tuning (SFT)",
+      "topics": ["Post-training overview", "Conversation format", "Human labelers", "Creating assistant models", "InstructGPT and data collection"],
+      "watch_before": "Complete this set after understanding how base models become assistants",
+      "questions": [
+        {
+          "q": "What is the main goal of supervised fine-tuning (SFT)?",
+          "opts": ["To make the model larger and more powerful", "To turn a base model into an assistant that can answer questions", "To teach the model new languages"],
+          "a": 1,
+          "exp": "SFT transforms an internet document simulator (base model) into an assistant that can have conversations, answer questions, and follow instructions. This is done by training on conversation datasets."
+        },
+        {
+          "q": "What type of data is used for supervised fine-tuning?",
+          "opts": ["More internet documents", "Datasets of conversations between humans and assistants", "Code repositories"],
+          "a": 1,
+          "exp": "SFT uses datasets of conversations - multi-turn dialogues between a human and an ideal assistant. These conversations are created by human labelers following specific guidelines about how the assistant should behave."
+        },
+        {
+          "q": "How long does supervised fine-tuning typically take compared to pre-training?",
+          "opts": ["About the same time (3 months)", "Much shorter (hours vs months)", "Much longer (6 months vs 3 months)"],
+          "a": 1,
+          "exp": "Pre-training takes ~3 months on thousands of GPUs. SFT is much shorter - around 3 hours - because the conversation dataset is much smaller than the internet, and we're just adapting an already-trained model."
+        },
+        {
+          "q": "Who creates the 'ideal assistant responses' in SFT training data?",
+          "opts": ["Other AI models", "Human data labelers following company guidelines", "The model itself through self-improvement"],
+          "a": 1,
+          "exp": "Human data labelers (contractors hired by companies like OpenAI) write ideal assistant responses. They follow detailed labeling instructions (often hundreds of pages) about how the assistant should behave."
+        },
+        {
+          "q": "What are labeling instructions in the context of SFT?",
+          "opts": ["Instructions for how to label images", "Guidelines given to human labelers about how the assistant should respond", "Code comments in the training script"],
+          "a": 1,
+          "exp": "Labeling instructions are detailed guidelines (often hundreds of pages) written by the AI company. They tell human labelers how to write ideal assistant responses - be helpful, truthful, harmless, etc."
+        },
+        {
+          "q": "What was one of the high-level instructions given to labelers in the InstructGPT paper?",
+          "opts": ["Be creative and entertaining", "Be helpful, truthful, and harmless", "Be brief and technical"],
+          "a": 1,
+          "exp": "The InstructGPT paper (OpenAI 2022) showed labelers were instructed to be 'helpful, truthful, and harmless' when writing assistant responses. This shapes the personality and values of the resulting assistant."
+        },
+        {
+          "q": "How do modern SFT datasets differ from early efforts like InstructGPT?",
+          "opts": ["They are smaller and more focused", "They use more LLM assistance and synthetic data generation", "They only use expert PhD-level writers"],
+          "a": 1,
+          "exp": "Modern SFT involves significant LLM assistance - models help generate responses that humans then edit/curate. It's no longer purely manual writing. This allows for larger, more diverse datasets (millions of conversations)."
+        },
+        {
+          "q": "When you talk to ChatGPT, what are you essentially getting?",
+          "opts": ["Direct access to an AI brain", "A statistical simulation of a human data labeler following OpenAI's guidelines", "A search engine with conversation"],
+          "a": 1,
+          "exp": "ChatGPT is statistically imitating human labelers who followed OpenAI's instructions. It's not a magical AI consciousness - it's learned to mimic the patterns of how expert labelers (hired by OpenAI) would respond."
+        },
+        {
+          "q": "What is a 'system message' in the conversation format?",
+          "opts": ["An error message from the system", "A hidden initial message that reminds the model of its identity and role", "The user's first message"],
+          "a": 1,
+          "exp": "System messages are invisible tokens at the start of conversations that set context: 'You are a helpful assistant created by OpenAI named ChatGPT...' This programs the model's behavior and self-knowledge for that conversation."
+        },
+        {
+          "q": "Why might different companies' assistants behave differently even if trained on similar base models?",
+          "opts": ["They use different computer hardware", "They have different labeling instructions and conversation datasets", "Some models are smarter than others"],
+          "a": 1,
+          "exp": "Each company writes their own labeling instructions and curates their own conversation data. Different guidelines (how formal to be, when to refuse, personality traits) create different assistant behaviors, even from similar base models."
+        }
+      ]
+    },
+    {
+      "set_number": 6,
+      "title": "LLM Psychology - Hallucinations & Knowledge",
+      "topics": ["Why models hallucinate", "Mitigation strategies", "Knowledge in parameters vs context", "Self-knowledge", "Factuality"],
+      "watch_before": "Complete this set after understanding model hallucinations and knowledge representation",
+      "questions": [
+        {
+          "q": "What is a 'hallucination' in the context of language models?",
+          "opts": ["When the model crashes or gives errors", "When the model makes up false information confidently", "When the model refuses to answer"],
+          "a": 1,
+          "exp": "Hallucinations are when models fabricate information - making up facts, citations, or details that don't exist. They do this confidently because they're statistically completing patterns, not accessing a database of facts."
+        },
+        {
+          "q": "Why do language models hallucinate when asked about unfamiliar people or topics?",
+          "opts": ["The model is trying to deceive the user", "The model learns to answer confidently from training data, even when uncertain", "The model has corrupted parameters"],
+          "a": 1,
+          "exp": "In training data, questions like 'Who is X?' are answered confidently by human labelers who researched X. The model learns this confident answer pattern. When asked about unknown people, it still follows the pattern and makes up plausible-sounding answers."
+        },
+        {
+          "q": "What is one key mitigation strategy for hallucinations described in the video?",
+          "opts": ["Make the model larger with more parameters", "Add examples to training data where the correct answer is 'I don't know'", "Train the model longer on internet data"],
+          "a": 1,
+          "exp": "Mitigation: probe the model to find what it doesn't know, then add training examples where the correct response is 'I don't know' or 'I'm not sure.' This teaches the model it's okay to express uncertainty."
+        },
+        {
+          "q": "What is the difference between knowledge in 'parameters' vs knowledge in the 'context window'?",
+          "opts": ["Parameters are faster to access than context", "Parameters are vague recollection; context is working memory with direct access", "There is no difference"],
+          "a": 1,
+          "exp": "Knowledge in parameters (from training) is like vague recollection - it might be wrong or fuzzy. Knowledge in the context window is like working memory - it's directly available, reliable, and easy to reference. Always better to put important info in context."
+        },
+        {
+          "q": "Why is it better to include relevant text in your prompt rather than relying on the model's memory?",
+          "opts": ["It makes the response faster", "Context window provides direct, reliable access vs vague parameter memory", "It uses less tokens"],
+          "a": 1,
+          "exp": "Even if the model 'knows' something from training, putting it in the context window ensures accuracy. Context is working memory (directly accessible), while parameters are long-term memory (vague, possibly inaccurate)."
+        },
+        {
+          "q": "What happens if you ask a base model 'What model are you?' without specific training?",
+          "opts": ["It will refuse to answer", "It will likely say ChatGPT by OpenAI (hallucinating the most common answer)", "It will give its actual architecture details"],
+          "a": 1,
+          "exp": "Without explicit training on self-identity, models hallucinate their label. Since ChatGPT/OpenAI are extremely common in training data (internet text), models default to claiming they are ChatGPT, even if they're not."
+        },
+        {
+          "q": "How can companies program their model's self-identity?",
+          "opts": ["By modifying the neural network architecture", "By adding hardcoded self-description conversations to training data or using system messages", "By changing the tokenizer"],
+          "a": 1,
+          "exp": "Two methods: (1) Add conversations to training data like 'What's your name?' → 'I'm Claude by Anthropic', or (2) Use system messages that remind the model of its identity at the start of each conversation."
+        },
+        {
+          "q": "According to the video, what does the LLaMA model do to establish self-identity?",
+          "opts": ["It relies on users telling it who it is", "It includes ~240 hardcoded conversations about itself in training data", "It doesn't have any self-identity"],
+          "a": 1,
+          "exp": "LLaMA's training includes ~240 hardcoded conversations specifically about its identity ('I'm LLaMA developed by Meta'). These examples teach the model how to respond to self-referential questions."
+        },
+        {
+          "q": "What is Meta's approach (shown in the LLaMA 3 paper) to reducing hallucinations?",
+          "opts": ["Use a bigger model with more parameters", "Interrogate the model to find knowledge boundaries, then add 'I don't know' examples", "Train on higher quality internet data"],
+          "a": 1,
+          "exp": "Meta's approach: (1) Generate questions from training documents, (2) Test if the model knows the answers, (3) For questions it gets wrong, add training examples where the correct response is 'I don't know.' This teaches honest uncertainty."
+        },
+        {
+          "q": "Why might a model accurately recite a Wikipedia article about zebras?",
+          "opts": ["Wikipedia pays to have their content prioritized", "High-quality sources like Wikipedia are often seen multiple times (multiple epochs) during training", "The model has internet access during inference"],
+          "a": 1,
+          "exp": "Models can memorize high-quality sources that appear multiple times in training. Wikipedia might be seen 10+ times ('epochs'), causing near-verbatim memorization - similar to how humans memorize text they read repeatedly."
+        }
+      ]
+    },
+    {
+      "set_number": 7,
+      "title": "LLM Psychology - Tools & Computational Limitations",
+      "topics": ["Web search tool", "Code interpreter", "Token-based thinking", "Counting and spelling limitations", "Mental arithmetic"],
+      "watch_before": "Complete this set after understanding model tools and computational constraints",
+      "questions": [
+        {
+          "q": "What is tool use in the context of language models?",
+          "opts": ["The model using internal functions", "The model calling external tools like web search or code execution", "The model using different neural network layers"],
+          "a": 1,
+          "exp": "Tool use means the model can call external functions (web search, code interpreter, calculators) by emitting special tokens. The results are inserted into the context window, augmenting the model's capabilities beyond pure token prediction."
+        },
+        {
+          "q": "How does web search tool use work?",
+          "opts": ["The model has real-time internet access built-in", "The model emits special search tokens, results are fetched and added to context", "The model guesses what's on the internet"],
+          "a": 1,
+          "exp": "The model emits special tokens like <search>query</search>. The inference system pauses, performs the actual search, then inserts results into the context window. The model then continues with this new information available."
+        },
+        {
+          "q": "Why should you ask models to use code for arithmetic instead of mental math?",
+          "opts": ["Code is faster to execute", "Models can make errors in mental arithmetic, but code execution is reliable", "Code uses fewer tokens"],
+          "a": 1,
+          "exp": "Models doing mental arithmetic is like humans doing math in their head - errors can happen. Code interpreter runs actual code, which is deterministic and reliable. For important calculations, always prefer code execution."
+        },
+        {
+          "q": "What does 'models need tokens to think' mean?",
+          "opts": ["Models must be paid in tokens", "Complex reasoning must be distributed across multiple tokens, not crammed into one", "Models can only think about tokens"],
+          "a": 1,
+          "exp": "Each token has limited computation (finite forward pass). Complex problems require multiple tokens with intermediate steps. Asking for an answer in one token forces too much computation per token, causing errors."
+        },
+        {
+          "q": "Why is the solution that shows all intermediate steps better than jumping to the answer?",
+          "opts": ["It looks more professional to users", "It distributes computation across tokens, avoiding overloading any single token", "It takes more time to compute"],
+          "a": 1,
+          "exp": "When models write out steps (cost of oranges = 4, 13-4=9, etc.), they spread computation across tokens. Each token does simple work. Jumping straight to the answer crams too much computation into one token, causing errors."
+        },
+        {
+          "q": "What happens if you force a model to answer a complex question in a single token?",
+          "opts": ["It works fine - models are very capable", "The model likely makes errors due to limited per-token computation", "The model refuses and asks for more tokens"],
+          "a": 1,
+          "exp": "With complex problems, forcing a single-token answer overloads that token's limited computation budget. The model will likely make mistakes. Example shown: simple numbers work, but larger numbers fail in single-token answers."
+        },
+        {
+          "q": "Why are language models not good at counting letters in words?",
+          "opts": ["Models don't understand the alphabet", "Models see tokens (chunks of text), not individual characters", "Models are not trained on spelling tasks"],
+          "a": 1,
+          "exp": "Models see tokens, not characters. 'ubiquitous' is three tokens (u-biqu-itous), not individual letters. Counting letters requires character-level access that models don't natively have. Using code to count solves this."
+        },
+        {
+          "q": "What was the famous example of a spelling limitation in models?",
+          "opts": ["Counting Rs in 'strawberry'", "Spelling 'supercalifragilistic'", "Counting letters in 'antidisestablishmentarianism'"],
+          "a": 0,
+          "exp": "Models struggled with 'How many Rs in strawberry?' (answer: 3). This combines two weaknesses: (1) not seeing individual characters (seeing tokens instead), and (2) poor counting ability. Modern models now handle this specific case."
+        },
+        {
+          "q": "Why might a model fail on '9.11 vs 9.9' but succeed on complex math problems?",
+          "opts": ["The model is bad at decimals", "Swiss cheese model - random holes in capabilities, possibly due to conflicting patterns (Bible verses)", "The model wasn't trained on decimal comparison"],
+          "a": 1,
+          "exp": "This is the 'Swiss cheese' model of capabilities - the model is amazing at complex tasks but randomly fails on simple ones. For 9.11 vs 9.9, neurons associated with Bible verse numbering (where 9:11 > 9:9) may interfere, causing confusion."
+        },
+        {
+          "q": "What is the best practice when asking models to solve problems?",
+          "opts": ["Always ask for the fastest possible answer", "Ask the model to show its work with intermediate steps", "Provide the answer and ask the model to verify"],
+          "a": 1,
+          "exp": "Best practice: ask models to show reasoning steps. This distributes computation across tokens, reduces errors, and lets you verify the logic. For critical calculations, also consider using code interpreter for deterministic results."
+        }
+      ]
+    },
+    {
+      "set_number": 8,
+      "title": "Reinforcement Learning Basics",
+      "topics": ["RL vs SFT", "Practice problems analogy", "DeepSeek R1", "Thinking models", "Chain of thought", "Move 37"],
+      "watch_before": "Complete this set after understanding reinforcement learning for LLMs",
+      "questions": [
+        {
+          "q": "What is the main difference between supervised fine-tuning (SFT) and reinforcement learning (RL)?",
+          "opts": ["SFT is faster and cheaper than RL", "SFT imitates expert solutions; RL discovers solutions through trial and error", "RL requires human labelers; SFT does not"],
+          "a": 1,
+          "exp": "SFT shows the model expert solutions to imitate (like worked examples in textbooks). RL gives the model problems and final answers, letting it practice and discover its own solution strategies (like practice problems)."
+        },
+        {
+          "q": "What does the model receive in RL training?",
+          "opts": ["Expert step-by-step solutions", "Problems and correct final answers (not the solution process)", "Only problems with no answers"],
+          "a": 1,
+          "exp": "In RL, the model gets prompts (problems) and knows the correct final answer, but NOT the solution steps. It must discover through trial and error what token sequences reliably reach the correct answer."
+        },
+        {
+          "q": "Why can't human labelers write the 'optimal' solution for all problems?",
+          "opts": ["Humans are not smart enough", "What's easy/hard for humans differs from what's easy/hard for LLMs", "Humans don't have time to write solutions"],
+          "a": 1,
+          "exp": "Human and LLM cognition differ. Token sequences that are easy for humans might require huge leaps for LLMs (and vice versa). Only the LLM can discover which token sequences work well for its own computation patterns."
+        },
+        {
+          "q": "In the RL process, what happens after generating many solution attempts?",
+          "opts": ["All solutions are added to training data", "Solutions that reach the correct answer are reinforced (trained on)", "Solutions are evaluated by humans"],
+          "a": 1,
+          "exp": "The model generates many solutions (e.g., 1000 per problem). Solutions reaching correct answers are reinforced - the model trains on them, making similar approaches more likely in the future. Incorrect solutions are discouraged."
+        },
+        {
+          "q": "What is an emergent property of RL training that wasn't explicitly programmed?",
+          "opts": ["The model learns to write code", "The model develops chains of thought with self-reflection ('wait, let me reconsider')", "The model learns to refuse harmful requests"],
+          "a": 1,
+          "exp": "Models trained with RL spontaneously develop internal reasoning - backtracking, reconsidering, trying multiple approaches. This emerges because it improves accuracy, not because humans programmed it. It's discovering thinking strategies."
+        },
+        {
+          "q": "What is DeepSeek R1?",
+          "opts": ["A new search engine", "A reasoning model trained with RL that publicly shared implementation details", "A Chinese language model"],
+          "a": 1,
+          "exp": "DeepSeek R1 (2024/2025) is a reasoning model trained with RL. It's significant because DeepSeek publicly detailed their RL approach, reinvigorating public interest in RL for LLMs after companies had kept methods private."
+        },
+        {
+          "q": "What are 'thinking' or 'reasoning' models?",
+          "opts": ["Models that think like humans", "Models trained with RL that show extended chain-of-thought reasoning", "Models specifically designed for mathematics"],
+          "a": 1,
+          "exp": "Thinking/reasoning models (like DeepSeek R1, OpenAI o1/o3) are trained with RL. They generate long internal reasoning chains, trying multiple approaches and self-correcting - this thinking improves accuracy on hard problems."
+        },
+        {
+          "q": "Why do thinking models generate much longer responses than SFT models?",
+          "opts": ["They are trained to be more verbose", "They generate internal reasoning chains (chain of thought) before answering", "They repeat information multiple times"],
+          "a": 1,
+          "exp": "Thinking models discover that extensive reasoning (trying approaches, backtracking, reconsidering) improves accuracy. They generate long internal monologues that users may or may not see, then provide the final answer."
+        },
+        {
+          "q": "What was 'Move 37' in the context of AlphaGo?",
+          "opts": ["The 37th move in every game", "A move that no human would play but was brilliant, discovered through RL", "A move that caused AlphaGo to lose"],
+          "a": 1,
+          "exp": "Move 37 was AlphaGo's move with ~1/10,000 human probability - completely unconventional. But it was brilliant. RL allowed AlphaGo to discover strategies beyond human play. This shows RL can transcend human expertise."
+        },
+        {
+          "q": "In principle, what could RL enable in language models similar to AlphaGo's Move 37?",
+          "opts": ["Faster response times", "Discovery of problem-solving strategies that humans haven't thought of", "Ability to answer any question correctly"],
+          "a": 1,
+          "exp": "Just as AlphaGo discovered superhuman Go strategies, LLMs with RL could discover novel reasoning approaches, analogies, or thinking strategies that humans haven't conceived. This requires large, diverse problem sets to practice on."
+        }
+      ]
+    },
+    {
+      "set_number": 9,
+      "title": "RLHF & Unverifiable Domains",
+      "topics": ["RLHF explained", "Reward models", "Verifiable vs unverifiable domains", "Discriminator-generator gap", "RLHF limitations"],
+      "watch_before": "Complete this set after understanding RLHF and its role in unverifiable tasks",
+      "questions": [
+        {
+          "q": "What is the difference between 'verifiable' and 'unverifiable' domains?",
+          "opts": ["Verifiable means the model is confident; unverifiable means uncertain", "Verifiable has concrete correct answers (math); unverifiable requires human judgment (creative writing)", "Verifiable uses code; unverifiable uses natural language"],
+          "a": 1,
+          "exp": "Verifiable domains (math, code) have objectively correct answers you can check automatically. Unverifiable domains (jokes, poems, summaries) require subjective human judgment - no automatic scoring."
+        },
+        {
+          "q": "Why can't we easily run RL on creative writing tasks like 'write a joke about pelicans'?",
+          "opts": ["Models are bad at creative writing", "We can't automatically score which jokes are better without humans", "Creative writing doesn't have a final answer"],
+          "a": 1,
+          "exp": "RL needs automatic scoring to try many solutions. For jokes, there's no automatic 'correctness' check - humans must judge quality. Getting humans to score thousands of solutions for thousands of prompts is impractical."
+        },
+        {
+          "q": "What is RLHF (Reinforcement Learning from Human Feedback)?",
+          "opts": ["Training models to respond to human emotions", "Using a reward model to simulate human preferences, enabling RL in unverifiable domains", "Having humans train the model directly"],
+          "a": 1,
+          "exp": "RLHF trains a separate 'reward model' (a neural network) to score outputs by imitating human preferences. This model acts as a human simulator, allowing RL without needing actual humans to score billions of outputs."
+        },
+        {
+          "q": "How is a reward model trained?",
+          "opts": ["By copying the language model's weights", "By learning from human rankings/comparisons of model outputs", "By analyzing internet text"],
+          "a": 1,
+          "exp": "Humans rank/order multiple outputs for the same prompt (e.g., rank 5 jokes from best to worst). The reward model learns to predict scores that match human rankings, becoming a preference simulator."
+        },
+        {
+          "q": "What is the 'discriminator-generator gap' advantage of RLHF?",
+          "opts": ["Reward models are faster than language models", "It's easier for humans to judge/rank outputs than to generate perfect outputs", "Discriminators use less memory than generators"],
+          "a": 1,
+          "exp": "Generating the perfect joke is hard for humans. But ranking 5 jokes from best to worst is much easier. RLHF exploits this: we get higher-quality training signal by having humans discriminate (judge) rather than generate."
+        },
+        {
+          "q": "What is a major limitation of RLHF compared to true RL?",
+          "opts": ["RLHF is more expensive", "The reward model can be gamed/fooled with adversarial examples, limiting how long you can train", "RLHF only works for creative tasks"],
+          "a": 1,
+          "exp": "Reward models are imperfect simulators. RL will discover 'adversarial examples' - nonsensical outputs that fool the reward model into giving high scores. This limits training duration before outputs degrade into gibberish."
+        },
+        {
+          "q": "What might happen if you run RLHF for too many training steps?",
+          "opts": ["The model becomes too expensive to run", "The model finds ways to game the reward model, producing high-scoring nonsense", "The model forgets its training"],
+          "a": 1,
+          "exp": "Example: after many steps, top 'jokes' might be 'the the the the the' - nonsense that somehow scores highly in the reward model. RL exploits any weakness in the reward model, finding adversarial examples."
+        },
+        {
+          "q": "According to the video, is RLHF 'true RL' in the magical sense?",
+          "opts": ["Yes, it's real RL with all benefits", "No, it's more like a fine-tuning technique with limited scaling potential", "Yes, but only for creative tasks"],
+          "a": 1,
+          "exp": "The video argues RLHF is 'not RL in the magical sense' - you can't run it indefinitely to get superhuman performance because the reward function (reward model) is gameable. It's useful fine-tuning, but not unlimited scaling."
+        },
+        {
+          "q": "Why can you run RL indefinitely on math problems but not on RLHF for creative writing?",
+          "opts": ["Math is more important than creative writing", "Math has ungameable objective answers; RLHF reward models can be gamed", "Creative writing requires human creativity"],
+          "a": 1,
+          "exp": "Math: the answer is either correct or not - hard to game. RLHF: the reward model is a neural network simulator with exploitable weaknesses. RL will find adversarial inputs that fool it, limiting how long you can train."
+        },
+        {
+          "q": "How do current models like GPT-4 use RLHF?",
+          "opts": ["They don't use RLHF anymore", "As a short fine-tuning step (few hundred updates) to slightly improve quality", "As the primary training method"],
+          "a": 1,
+          "exp": "Models like GPT-4 likely use RLHF for limited fine-tuning (few hundred steps) to improve quality on unverifiable tasks. But it's cropped before it starts degrading. It's not the magical unlimited scaling that true RL provides."
+        }
+      ]
+    },
+    {
+      "set_number": 10,
+      "title": "Future Directions & Practical Usage",
+      "topics": ["Multimodality", "Agents", "Model access", "Staying updated", "Best practices"],
+      "watch_before": "Complete this set after watching the entire video",
+      "questions": [
+        {
+          "q": "What does 'multimodal' mean for language models?",
+          "opts": ["Using multiple neural networks", "Handling multiple types of data: text, audio, images, video", "Training on multiple languages"],
+          "a": 1,
+          "exp": "Multimodal models can natively process and generate multiple data types - not just text, but also audio (hearing/speaking), images (seeing/creating), and potentially video. This is done by tokenizing these modalities."
+        },
+        {
+          "q": "How can images and audio be added to language models?",
+          "opts": ["By using separate models for each modality", "By tokenizing images (patches) and audio (spectrograms) into the token sequence", "By converting everything to text descriptions"],
+          "a": 1,
+          "exp": "Images can be tokenized as patches, audio as spectrogram slices. These become tokens in the sequence alongside text tokens. The same Transformer architecture can then process multimodal token streams."
+        },
+        {
+          "q": "What are 'agents' in the context of LLMs?",
+          "opts": ["Human operators controlling the models", "Systems that perform long-running tasks with minimal supervision", "Multiple models working together"],
+          "a": 1,
+          "exp": "Agents are LLMs that execute extended tasks over time (minutes/hours), stringing together multiple subtasks, with occasional human supervision. They're evolving beyond single-shot question answering to longer-running job execution."
+        },
+        {
+          "q": "What is 'test-time training' or 'test-time compute'?",
+          "opts": ["Training the model during inference", "Updating model parameters based on the specific task during inference", "Using more compute to generate better responses"],
+          "a": 1,
+          "exp": "Currently, models are trained once then frozen. Test-time training would allow parameter updates during inference based on the specific task/context - like how human brains update during sleep. This is active research."
+        },
+        {
+          "q": "According to the video, where should you go to compare state-of-the-art models?",
+          "opts": ["GitHub", "LMSys Arena (Chatbot Arena leaderboard)", "Papers with Code"],
+          "a": 1,
+          "exp": "LMSys Arena (formerly Chatbot Arena) ranks models based on human blind comparisons. Users judge outputs without knowing which model produced them, creating rankings. Though the video notes it may be somewhat gamed recently."
+        },
+        {
+          "q": "What newsletter does the video recommend for staying updated on AI news?",
+          "opts": ["AI Daily", "AI News (by swyx and friends)", "The Batch"],
+          "a": 1,
+          "exp": "The video recommends 'AI News' newsletter by swyx and friends - a comprehensive, nearly-daily newsletter that combines human curation with LLM assistance to cover AI developments."
+        },
+        {
+          "q": "Where can you access proprietary models like GPT-4 or Claude?",
+          "opts": ["By downloading them from GitHub", "Through the company websites (chat.openai.com, claude.ai)", "Only through API access"],
+          "a": 1,
+          "exp": "Proprietary models are accessed through company interfaces: chat.openai.com for OpenAI models, claude.ai for Anthropic's Claude, ai.google.dev for Gemini. Some also offer API access."
+        },
+        {
+          "q": "Where can you find and use open-weight models like LLaMA or DeepSeek?",
+          "opts": ["Only by running them on your own hardware", "Through inference providers like together.ai or hyperbolic.xyz", "They are not publicly available"],
+          "a": 1,
+          "exp": "Open-weight models can be downloaded and run locally (if you have hardware), or accessed through inference providers like together.ai, hyperbolic.xyz, or others who host them for easy access."
+        },
+        {
+          "q": "What tool does the video recommend for running smaller models locally on your computer?",
+          "opts": ["Jupyter Notebook", "LM Studio", "VS Code"],
+          "a": 1,
+          "exp": "LM Studio is recommended for running smaller/quantized models locally on your laptop. While the UI has issues, it allows you to run models completely offline on your own hardware."
+        },
+        {
+          "q": "What is the video's main advice for using LLMs in practice?",
+          "opts": ["Always use the biggest, most expensive model", "Use them as tools, check their work, and own your final output", "Completely trust their outputs since they're very capable"],
+          "a": 1,
+          "exp": "Key advice: LLMs are powerful tools but not infallible. Use them for inspiration, first drafts, and acceleration. But always verify their work, check for hallucinations/errors, and take responsibility for final outputs."
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "total_questions": 100,
+    "total_sets": 10,
+    "questions_per_set": 10,
+    "difficulty": "Mixed (basic recall, application, and analysis)",
+    "source": "Andrej Karpathy - Introduction to Large Language Models",
+    "created_date": "2025",
+    "format_version": "1.0"
+  }
+}
