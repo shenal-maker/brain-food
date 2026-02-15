@@ -49,7 +49,10 @@ async function init() {
   }
 
   document.getElementById("video-title").textContent = currentVideo.title;
-  document.getElementById("video-frame").src = `https://www.youtube.com/embed/${currentVideo.videoId}`;
+  let embedUrl = `https://www.youtube.com/embed/${currentVideo.videoId}?`;
+  if (currentVideo.start) embedUrl += `start=${currentVideo.start}&`;
+  if (currentVideo.end) embedUrl += `end=${currentVideo.end}&`;
+  document.getElementById("video-frame").src = embedUrl;
 
   // Fallback link
   const link = document.getElementById("video-link");

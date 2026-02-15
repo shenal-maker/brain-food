@@ -19,6 +19,12 @@ function extractVideoId(url) {
   return m ? m[1] : null;
 }
 
+function esc(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
 function render() {
   const el = document.getElementById("curricula-list");
   if (!curricula.length) {
@@ -32,11 +38,11 @@ function render() {
     const doneQ = c.videos.reduce((s, v) => s + v.questionsCompleted, 0);
     const pct = totalV ? Math.round(doneV / totalV * 100) : 0;
     return `
-      <div class="curriculum-card" data-ci="${ci}">
+      <div class="curriculum-card">
         <div class="curriculum-header">
           <h2>${esc(c.name)}</h2>
           <div class="actions">
-            <button class="btn btn-sm btn-danger" onclick="deleteCur(${ci})">Delete</button>
+            <button class="btn btn-sm btn-danger" data-delete-cur="${ci}">Delete</button>
           </div>
         </div>
         <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
@@ -47,11 +53,11 @@ function render() {
               <div class="video-item-header">
                 <span class="video-item-title ${v.completed ? 'completed' : ''}">${esc(v.title)}</span>
                 <div class="video-item-actions">
-                  <button class="btn btn-sm btn-ghost collapsible-toggle" onclick="toggleQuestions(this,${ci},${vi})">Questions (${v.questions.length})</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteVideo(${ci},${vi})">x</button>
+                  <button class="btn btn-sm btn-ghost collapsible-toggle" data-toggle-qs="${ci}-${vi}">Questions (${v.questions.length})</button>
+                  <button class="btn btn-sm btn-danger" data-delete-vid="${ci}-${vi}">x</button>
                 </div>
               </div>
-              <div class="video-item-meta">${esc(v.url)}</div>
+              <div class="video-item-meta">${esc(v.url)}${v.start != null || v.end != null ? ` (${fmtTime(v.start)}–${fmtTime(v.end)})` : ''}</div>
               <div id="qs-${ci}-${vi}" style="display:none"></div>
             </li>
           `).join("")}
@@ -60,29 +66,53 @@ function render() {
           <h3>Add Video</h3>
           <div class="form-row">
             <input id="vurl-${ci}" placeholder="YouTube URL">
-            <input id="vtitle-${ci}" placeholder="Title">
-            <button class="btn btn-sm" onclick="addVideo(${ci})">Add</button>
+            <input id="vtitle-${ci}" placeholder="Title (e.g. Eigenvalues - Intro)">
+          </div>
+          <div class="form-row">
+            <input id="vstart-${ci}" placeholder="Start (e.g. 18:30) optional">
+            <input id="vend-${ci}" placeholder="End (e.g. 45:00) optional">
+            <button class="btn btn-sm" data-add-vid="${ci}">Add</button>
           </div>
         </div>
       </div>`;
   }).join("");
+
+  // Bind event listeners
+  el.querySelectorAll("[data-delete-cur]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const ci = parseInt(btn.dataset.deleteCur);
+      if (confirm("Delete this curriculum?")) { curricula.splice(ci, 1); save(); render(); }
+    });
+  });
+  el.querySelectorAll("[data-delete-vid]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const [ci, vi] = btn.dataset.deleteVid.split("-").map(Number);
+      curricula[ci].videos.splice(vi, 1); save(); render();
+    });
+  });
+  el.querySelectorAll("[data-add-vid]").forEach(btn => {
+    btn.addEventListener("click", () => addVideo(parseInt(btn.dataset.addVid)));
+  });
+  el.querySelectorAll("[data-toggle-qs]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const [ci, vi] = btn.dataset.toggleQs.split("-").map(Number);
+      toggleQuestions(btn, ci, vi);
+    });
+  });
 }
 
-function esc(s) {
-  const d = document.createElement("div");
-  d.textContent = s;
-  return d.innerHTML;
+function fmtTime(s) {
+  if (s == null) return "end";
+  const m = Math.floor(s / 60), sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
-function deleteCur(ci) {
-  if (!confirm("Delete this curriculum?")) return;
-  curricula.splice(ci, 1);
-  save(); render();
-}
-
-function deleteVideo(ci, vi) {
-  curricula[ci].videos.splice(vi, 1);
-  save(); render();
+function timeToSeconds(t) {
+  if (!t) return null;
+  const parts = t.split(":").map(Number);
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  return null;
 }
 
 function addVideo(ci) {
@@ -91,8 +121,10 @@ function addVideo(ci) {
   if (!url || !title) return;
   const videoId = extractVideoId(url);
   if (!videoId) { alert("Invalid YouTube URL"); return; }
+  const start = timeToSeconds(document.getElementById(`vstart-${ci}`).value.trim());
+  const end = timeToSeconds(document.getElementById(`vend-${ci}`).value.trim());
   curricula[ci].videos.push({
-    id: uid(), title, url, videoId, completed: false, questions: [], questionsCompleted: 0
+    id: uid(), title, url, videoId, start, end, completed: false, questions: [], questionsCompleted: 0
   });
   save(); render();
 }
@@ -116,7 +148,7 @@ function renderQuestions(ci, vi) {
             <div class="q-text">${esc(q.q)}</div>
             <div class="q-answer">Answer: ${esc(q.opts[q.a])}${q.exp ? ' — ' + esc(q.exp) : ''}</div>
           </div>
-          <button class="btn btn-sm btn-danger" onclick="deleteQuestion(${ci},${vi},${qi})">x</button>
+          <button class="btn btn-sm btn-danger" data-delete-q="${ci}-${vi}-${qi}">x</button>
         </div>
       `).join("") || '<div class="empty-state" style="padding:1rem">No questions yet</div>'}
     </div>
@@ -135,14 +167,34 @@ function renderQuestions(ci, vi) {
           <option value="2">C is correct</option>
         </select>
         <input id="qe-${ci}-${vi}" placeholder="Explanation (optional)" style="flex:1">
-        <button class="btn btn-sm" onclick="addQuestion(${ci},${vi})">Add</button>
+        <button class="btn btn-sm" data-add-q="${ci}-${vi}">Add</button>
       </div>
+    </div>
+    <div class="question-form" style="margin-top:8px">
+      <h4>Bulk Import JSON</h4>
+      <textarea id="qbulk-${ci}-${vi}" placeholder='[{"q":"...","opts":["A","B","C"],"a":0,"exp":"..."}]' style="width:100%;height:60px;background:#252525;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:0.8rem;padding:8px;resize:vertical;font-family:monospace"></textarea>
+      <button class="btn btn-sm" data-bulk-q="${ci}-${vi}" style="margin-top:6px">Import</button>
     </div>`;
-}
 
-function deleteQuestion(ci, vi, qi) {
-  curricula[ci].videos[vi].questions.splice(qi, 1);
-  save(); renderQuestions(ci, vi);
+  el.querySelectorAll("[data-delete-q]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const [c, v2, q] = btn.dataset.deleteQ.split("-").map(Number);
+      curricula[c].videos[v2].questions.splice(q, 1); save(); renderQuestions(c, v2);
+    });
+  });
+  el.querySelector("[data-add-q]").addEventListener("click", () => addQuestion(ci, vi));
+  el.querySelector("[data-bulk-q]").addEventListener("click", () => {
+    const raw = document.getElementById(`qbulk-${ci}-${vi}`).value.trim();
+    try {
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) throw "Not an array";
+      arr.forEach(q => {
+        if (!q.q || !q.opts || q.a === undefined) throw "Invalid format";
+        curricula[ci].videos[vi].questions.push({ q: q.q, opts: q.opts, a: q.a, exp: q.exp || "" });
+      });
+      save(); renderQuestions(ci, vi);
+    } catch (e) { alert("Invalid JSON: " + e); }
+  });
 }
 
 function addQuestion(ci, vi) {
