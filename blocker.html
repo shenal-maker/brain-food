@@ -27,9 +27,22 @@
     </a>
   </div>
 
+  <!-- Notes -->
+  <div class="section" id="notes-section">
+    <h2>Notes</h2>
+    <textarea id="notes" placeholder="Jot down anything important..." rows="4" style="width:100%;background:#252525;border:1px solid #333;border-radius:6px;color:#e0e0e0;padding:10px;font-size:0.9rem;resize:vertical;font-family:inherit;"></textarea>
+  </div>
+
+  <!-- One-sentence takeaway -->
+  <div class="section" id="takeaway-section">
+    <h2>One-Sentence Takeaway</h2>
+    <p style="color:#888;font-size:0.85rem;margin-bottom:8px;">Summarize the key idea in your own words.</p>
+    <input id="takeaway" type="text" placeholder="The main thing I learned is..." style="width:100%;background:#252525;border:1px solid #333;border-radius:6px;color:#e0e0e0;padding:10px;font-size:0.9rem;">
+  </div>
+
   <!-- Math Problems -->
   <div class="section" id="math-section">
-    <h2>Math Problems</h2>
+    <h2>Check-in Questions</h2>
     <div id="problems-container"></div>
   </div>
 
@@ -41,6 +54,7 @@
 
   <button class="btn" id="submit-btn" disabled>Complete Exercise</button>
   <div id="result"></div>
+  <canvas id="confetti-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:9999;"></canvas>
 
   <script src="blocker.js"></script>
 </body>

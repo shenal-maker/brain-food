@@ -70,7 +70,31 @@ async function init() {
   timeLeft = data.timerDuration || 600;
   startTimer();
 
+  // Load saved notes
+  const saved = await chrome.storage.local.get(["videoNotes"]);
+  const allNotes = saved.videoNotes || {};
+  if (allNotes[currentVideoId]) {
+    document.getElementById("notes").value = allNotes[currentVideoId].notes || "";
+    document.getElementById("takeaway").value = allNotes[currentVideoId].takeaway || "";
+  }
+
+  // Auto-save notes on input
+  const saveNotes = () => {
+    chrome.storage.local.get(["videoNotes"], (d) => {
+      const n = d.videoNotes || {};
+      n[currentVideoId] = {
+        notes: document.getElementById("notes").value,
+        takeaway: document.getElementById("takeaway").value,
+        title: currentVideo.title
+      };
+      chrome.storage.local.set({ videoNotes: n });
+    });
+  };
+  document.getElementById("notes").addEventListener("input", saveNotes);
+  document.getElementById("takeaway").addEventListener("input", saveNotes);
+
   document.addEventListener("change", checkReady);
+  document.getElementById("takeaway").addEventListener("input", checkReady);
   document.getElementById("submit-btn").addEventListener("click", submit);
 }
 
@@ -84,6 +108,7 @@ function startTimer() {
       document.getElementById("result").className = "result fail";
       document.getElementById("result").textContent = "Time's up! Refresh to try again.";
       document.getElementById("submit-btn").disabled = true;
+      playBeep(300, 0.3); setTimeout(() => playBeep(300, 0.3), 400);
     }
   }, 1000);
 }
@@ -130,7 +155,8 @@ function checkReady() {
     document.querySelector(`input[name="problem${i}"]:checked`)
   );
   const challengeChecked = document.getElementById("challenge-check")?.checked;
-  document.getElementById("submit-btn").disabled = !(allAnswered && challengeChecked);
+  const hasTakeaway = document.getElementById("takeaway").value.trim().length > 5;
+  document.getElementById("submit-btn").disabled = !(allAnswered && challengeChecked && hasTakeaway);
 }
 
 function submit() {
@@ -144,14 +170,17 @@ function submit() {
   const resultEl = document.getElementById("result");
 
   if (correct === currentProblems.length) {
-    const xpEarned = 20;
+    const bonus = timeLeft > 0 ? 10 : 0;
+    const xpEarned = 20 + bonus;
     resultEl.className = "result success";
-    resultEl.textContent = `All correct! +${xpEarned} XP. Browsing unlocked!`;
+    resultEl.textContent = `All correct! +${xpEarned} XP${bonus ? ' (+10 speed bonus!)' : ''}. Browsing unlocked!`;
     chrome.runtime.sendMessage({ type: "exerciseComplete", xp: xpEarned });
     if (currentVideoId) {
       chrome.runtime.sendMessage({ type: "markVideoComplete", videoId: currentVideoId });
     }
-    setTimeout(() => window.close(), 2000);
+    if (timeLeft > 0) fireConfetti();
+    playBeep(800, 0.15);
+    setTimeout(() => window.close(), 3000);
   } else {
     resultEl.className = "result fail";
     resultEl.textContent = `${correct}/${currentProblems.length} correct. Try again!`;
@@ -180,6 +209,48 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+function playBeep(freq, dur) {
+  const ctx = new AudioContext();
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.frequency.value = freq;
+  g.gain.value = 0.3;
+  o.start(); o.stop(ctx.currentTime + dur);
+}
+
+function fireConfetti() {
+  const canvas = document.getElementById("confetti-canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = ["#4f46e5","#4ade80","#fbbf24","#f87171","#a78bfa","#22d3ee"];
+  const particles = Array.from({ length: 120 }, () => ({
+    x: Math.random() * canvas.width,
+    y: -10 - Math.random() * canvas.height * 0.5,
+    w: 4 + Math.random() * 6,
+    h: 6 + Math.random() * 8,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vy: 2 + Math.random() * 4,
+    vx: (Math.random() - 0.5) * 4,
+    rot: Math.random() * Math.PI * 2,
+    rv: (Math.random() - 0.5) * 0.2
+  }));
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.rot += p.rv;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    if (++frame < 180) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  draw();
 }
 
 init();
