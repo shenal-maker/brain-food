@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Brain Food</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="points-popup" id="points-popup"></div>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h1>Brain Food</h1>
+        <div class="stats-row">
+          <div class="stat"><span id="stat-xp" class="stat-val">0</span><span class="stat-label">XP</span></div>
+          <div class="stat"><span id="stat-streak" class="stat-val">0</span><span class="stat-label">Streak</span></div>
+        </div>
+      </div>
+      <div class="sidebar-courses" id="sidebar-courses"></div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main" id="main">
+      <!-- View: Course list (home) -->
+      <div class="view" id="view-home"></div>
+      <!-- View: Set list for a course -->
+      <div class="view" id="view-course" style="display:none"></div>
+      <!-- View: Set preview (questions overview + watch button) -->
+      <div class="view" id="view-set" style="display:none"></div>
+      <!-- View: Video player with timer -->
+      <div class="view" id="view-video" style="display:none"></div>
+      <!-- View: Kahoot quiz -->
+      <div class="view" id="view-quiz" style="display:none"></div>
+      <!-- View: Quiz results -->
+      <div class="view" id="view-results" style="display:none"></div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

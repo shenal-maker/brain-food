@@ -35,7 +35,7 @@ function showNudge(minutes) {
   `;
   document.body.appendChild(bar);
   document.getElementById("brainfood-nudge-btn").addEventListener("click", () => {
-    window.location.href = chrome.runtime.getURL("blocker.html");
+    window.location.href = chrome.runtime.getURL("app.html");
   });
 }
 
@@ -67,7 +67,7 @@ function showBlocker() {
   document.body.style.overflow = "hidden";
 
   document.getElementById("brainfood-start").addEventListener("click", () => {
-    window.location.href = chrome.runtime.getURL("blocker.html");
+    window.location.href = chrome.runtime.getURL("app.html");
   });
 
   const observer = new MutationObserver(() => {

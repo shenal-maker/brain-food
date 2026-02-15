@@ -30,7 +30,7 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["blocker.html", "curriculum.html", "dashboard.html", "quiz.html", "llm_training_quiz.json"],
+      "resources": ["app.html", "blocker.html", "curriculum.html", "dashboard.html", "quiz.html", "llm_training_quiz.json", "courses.json"],
       "matches": ["<all_urls>"]
     }
   ],

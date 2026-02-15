@@ -1,0 +1,44 @@
+[
+  {
+    "id": "llm-training",
+    "title": "How LLMs Are Trained",
+    "description": "Deep dive into the entire LLM training pipeline from pre-training to deployment",
+    "tags": ["AI/ML", "LLMs", "Deep Learning"],
+    "videoUrl": "https://www.youtube.com/watch?v=7xTGNNLPyMI",
+    "videoId": "7xTGNNLPyMI",
+    "quizFile": "llm_training_quiz.json",
+    "timestamps": [
+      { "set": 1, "start": 0, "end": 600 },
+      { "set": 2, "start": 600, "end": 1200 },
+      { "set": 3, "start": 1200, "end": 1800 },
+      { "set": 4, "start": 1800, "end": 2400 },
+      { "set": 5, "start": 2400, "end": 3000 },
+      { "set": 6, "start": 3000, "end": 3600 },
+      { "set": 7, "start": 3600, "end": 4200 },
+      { "set": 8, "start": 4200, "end": 4800 },
+      { "set": 9, "start": 4800, "end": 5400 },
+      { "set": 10, "start": 5400, "end": 6000 }
+    ]
+  },
+  {
+    "id": "build-chatgpt",
+    "title": "Build ChatGPT From Scratch",
+    "description": "Learn to implement a GPT-style language model from the ground up",
+    "tags": ["AI/ML", "Coding", "Transformers"],
+    "comingSoon": true
+  },
+  {
+    "id": "ai-security",
+    "title": "AI Security & Cybersecurity",
+    "description": "Understanding adversarial attacks, model security, and AI safety",
+    "tags": ["Security", "AI Safety", "Red Teaming"],
+    "comingSoon": true
+  },
+  {
+    "id": "prompt-engineering",
+    "title": "Advanced Prompt Engineering",
+    "description": "Master techniques for getting the most out of LLMs",
+    "tags": ["AI/ML", "Practical", "Prompting"],
+    "comingSoon": true
+  }
+]
