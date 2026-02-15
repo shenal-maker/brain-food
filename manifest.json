@@ -1,14 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Brain Food",
-  "version": "1.0",
+  "version": "2.0",
   "description": "Block distracting sites until you complete your daily exercise",
 
   "permissions": [
     "storage",
     "alarms",
     "tabs",
-    "webNavigation"
+    "webNavigation",
+    "idle"
   ],
 
   "background": {
@@ -29,8 +30,12 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["blocker.html"],
+      "resources": ["blocker.html", "curriculum.html", "dashboard.html"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src 'self' https://www.youtube.com https://youtube.com"
+  }
 }
