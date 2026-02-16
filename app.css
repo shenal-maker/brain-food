@@ -125,3 +125,31 @@ body { background:#0f0f0f; color:#e0e0e0; font-family:-apple-system,BlinkMacSyst
 @keyframes pointsAnim { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)} 20%{opacity:1;transform:translate(-50%,-50%) scale(1.2)} 40%{transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-80%) scale(1)} }
 
 canvas#confetti { position:fixed; inset:0; pointer-events:none; z-index:200; }
+
+/* Heatmap */
+.heatmap { display:grid; grid-template-columns:repeat(10,1fr); gap:3px; padding:8px 12px; }
+.heatmap-cell { aspect-ratio:1; border-radius:3px; background:#252525; }
+.heatmap-cell.active { background:#4ade80; }
+
+/* Sidebar quote */
+.sidebar-quote { padding:10px 16px; font-size:0.75rem; color:#888; font-style:italic; border-top:1px solid #252525; }
+.sidebar-quote p { margin-bottom:2px; }
+.sidebar-quote span { font-style:normal; color:#555; font-size:0.7rem; }
+
+/* Stopped-at */
+.stopped-at { background:#1a1a1a; border-radius:10px; padding:12px 16px; margin-bottom:1rem; display:flex; align-items:center; gap:10px; }
+.stopped-at label { font-size:0.85rem; color:#888; white-space:nowrap; }
+.stopped-at input { flex:1; background:#252525; border:1px solid #333; border-radius:6px; color:#e0e0e0; padding:8px 10px; font-size:0.85rem; font-family:inherit; }
+
+/* Results extras */
+.quote-block { background:#252525; border-radius:10px; padding:16px; margin:1.5rem auto; max-width:400px; font-style:italic; color:#ccc; font-size:0.9rem; }
+.quote-block p { margin-bottom:4px; }
+.quote-block span { font-style:normal; color:#888; font-size:0.8rem; }
+.project-prompt { background:#1a2a1a; border:1px solid #2a3a2a; border-radius:10px; padding:16px; margin:1rem auto; max-width:400px; }
+.project-prompt h3 { font-size:0.85rem; color:#4ade80; margin-bottom:6px; }
+.project-prompt p { font-size:0.85rem; color:#ccc; }
+.tweet-btn { display:inline-block; background:#1d9bf0; color:#fff; border:none; padding:10px 24px; font-size:0.9rem; font-weight:600; border-radius:8px; text-decoration:none; margin-top:1rem; }
+.tweet-btn:hover { background:#1a8cd8; }
+
+/* Why it matters */
+.why-matters { font-size:0.8rem; color:#4ade80; margin:4px 0 8px; font-style:italic; }

@@ -3,6 +3,7 @@
     "id": "llm-training",
     "title": "How LLMs Are Trained",
     "description": "Deep dive into the entire LLM training pipeline from pre-training to deployment",
+    "whyItMatters": "So you can evaluate AI startups and talk training pipelines with CTOs",
     "tags": ["AI/ML", "LLMs", "Deep Learning"],
     "videoUrl": "https://www.youtube.com/watch?v=7xTGNNLPyMI",
     "videoId": "7xTGNNLPyMI",
@@ -24,6 +25,7 @@
     "id": "build-chatgpt",
     "title": "Build ChatGPT From Scratch",
     "description": "Learn to implement a GPT-style language model from the ground up",
+    "whyItMatters": "Understand what's under the hood so you can spot real innovation vs. hype",
     "tags": ["AI/ML", "Coding", "Transformers"],
     "comingSoon": true
   },
@@ -31,6 +33,7 @@
     "id": "ai-security",
     "title": "AI Security & Cybersecurity",
     "description": "Understanding adversarial attacks, model security, and AI safety",
+    "whyItMatters": "Essential for AI policy conversations and responsible deployment decisions",
     "tags": ["Security", "AI Safety", "Red Teaming"],
     "comingSoon": true
   },
@@ -38,6 +41,7 @@
     "id": "prompt-engineering",
     "title": "Advanced Prompt Engineering",
     "description": "Master techniques for getting the most out of LLMs",
+    "whyItMatters": "The highest-leverage skill for anyone working with AI daily",
     "tags": ["AI/ML", "Practical", "Prompting"],
     "comingSoon": true
   }

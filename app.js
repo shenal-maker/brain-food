@@ -1,27 +1,98 @@
 let courses = [];
 let quizCache = {};
-let state = { xp: 0, streak: 0, best: {}, notes: {} };
+let state = { xp: 0, streak: 0, best: {}, notes: {}, history: [], stoppedAt: {} };
 const TIME_PER_Q = 20;
-const VIDEO_TIMER = 600; // 10 min
+const VIDEO_TIMER = 600;
 
-// Quiz state
-let currentCourse, currentSet, currentQIdx, quizScore, quizStreak, quizCorrect, quizTotal, quizTimer, quizTimeLeft;
+const QUOTES = [
+  { text: "Creativity is not a talent. It is a way of operating.", by: "John Cleese" },
+  { text: "You don't have to be a genius. You just have to be yourself.", by: "Austin Kleon" },
+  { text: "Share something small every day.", by: "Austin Kleon" },
+  { text: "The real gap is between doing nothing and doing something.", by: "Clay Shirky" },
+  { text: "In the beginner's mind, there are many possibilities.", by: "Shunryu Suzuki" },
+  { text: "Find your voice, shout it from the rooftops, and keep doing it until the people that are looking for you find you.", by: "Dan Harmon" },
+  { text: "Give what you have. To someone, it may be better than you dare to think.", by: "Henry Wadsworth Longfellow" },
+  { text: "That's all any of us are: amateurs. We don't live long enough to be anything else.", by: "Charlie Chaplin" },
+  { text: "Think process, not product.", by: "Austin Kleon" },
+  { text: "Teach what you know.", by: "Austin Kleon" },
+  { text: "If your work isn't online, it doesn't exist.", by: "Austin Kleon" },
+  { text: "Be so good they can't ignore you.", by: "Steve Martin" }
+];
+
+const PROJECT_PROMPTS = {
+  "llm-training": [
+    "Write a Twitter thread explaining the 3 stages of LLM training to a non-technical friend",
+    "Draft a 1-pager: 'What I'd ask an AI startup about their training pipeline'",
+    "Sketch out what an LLM evaluation framework should include for a VC due diligence",
+    "Write a short post comparing two LLM providers you've tried",
+    "Draft 3 policy questions about LLM training data that regulators should ask",
+    "Create a glossary of 10 LLM terms every investor should know",
+    "Write a memo: 'Why understanding tokenization matters for product decisions'",
+    "Draft an investment thesis paragraph about open vs closed-weight models",
+    "Write a thread: 'What I learned about AI hallucinations and why it matters for trust'",
+    "Create a one-page brief on RLHF for a policy audience"
+  ]
+};
+
+let currentCourse, currentSet, currentSetIdx, currentQIdx, quizScore, quizStreak, quizCorrect, quizTotal, quizTimer, quizTimeLeft;
 let videoTimer, videoTimeLeft;
 
 async function boot() {
   courses = await fetch(chrome.runtime.getURL("courses.json")).then(r => r.json());
-  const d = await chrome.storage.local.get(["totalXP", "streak", "quizBest", "videoNotes"]);
+  const d = await chrome.storage.local.get(["totalXP", "streak", "quizBest", "videoNotes", "studyHistory", "stoppedAt"]);
   state.xp = d.totalXP || 0;
   state.streak = d.streak || 0;
   state.best = d.quizBest || {};
   state.notes = d.videoNotes || {};
+  state.history = d.studyHistory || [];
+  state.stoppedAt = d.stoppedAt || {};
   renderSidebar();
   showHome();
+}
+
+function recordStudyDay() {
+  const today = new Date().toISOString().slice(0, 10);
+  if (!state.history.includes(today)) {
+    state.history.push(today);
+    if (state.history.length > 90) state.history = state.history.slice(-90);
+    chrome.storage.local.set({ studyHistory: state.history });
+  }
+}
+
+function renderHeatmap() {
+  const today = new Date();
+  const days = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    days.push({ key, active: state.history.includes(key) });
+  }
+  return `<div class="heatmap">${days.map(d =>
+    `<div class="heatmap-cell${d.active ? ' active' : ''}" title="${d.key}"></div>`
+  ).join("")}</div>`;
+}
+
+function randomQuote() {
+  return QUOTES[Math.floor(Math.random() * QUOTES.length)];
 }
 
 function renderSidebar() {
   document.getElementById("stat-xp").textContent = state.xp;
   document.getElementById("stat-streak").textContent = state.streak;
+
+  // Heatmap
+  document.getElementById("sidebar-heatmap").innerHTML = renderHeatmap();
+  const activeDays = state.history.filter(d => {
+    const diff = (Date.now() - new Date(d).getTime()) / 86400000;
+    return diff <= 30;
+  }).length;
+  document.getElementById("consistency-label").textContent = `${activeDays}/30 days active`;
+
+  // Quote
+  const q = randomQuote();
+  document.getElementById("sidebar-quote").innerHTML = `<p>"${q.text}"</p><span>— ${q.by}</span>`;
+
+  // Courses
   const el = document.getElementById("sidebar-courses");
   el.innerHTML = courses.map((c, i) => {
     if (c.comingSoon) return `<div class="sidebar-course" style="opacity:0.4;cursor:default"><h3>${c.title}</h3><div class="meta">Coming soon</div></div>`;
@@ -49,12 +120,12 @@ function showHome() {
   showView("view-home");
   document.querySelectorAll(".sidebar-course").forEach(e => e.classList.remove("active"));
   const el = document.getElementById("view-home");
-  el.innerHTML = `<h2 style="font-size:1.5rem;color:#fff;margin-bottom:0.25rem">Your Courses</h2>
-    <p style="color:#888;margin-bottom:1rem">Pick a course to study</p>
+  el.innerHTML = `<h2 style="font-size:1.5rem;color:#fff;margin-bottom:0.25rem">Building Technical Intuition</h2>
+    <p style="color:#888;margin-bottom:1.5rem">You don't have to be the one debugging the code. You have to be the one who understands what's possible.</p>
     <div class="course-grid">${courses.map((c, i) => {
-      if (c.comingSoon) return `<div class="course-card coming-soon"><h3>${c.title}</h3><div class="desc">${c.description}</div><div>${c.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div><div class="prog" style="color:#555">Coming soon</div></div>`;
+      if (c.comingSoon) return `<div class="course-card coming-soon"><h3>${c.title}</h3><div class="desc">${c.description}</div>${c.whyItMatters ? `<div class="why-matters">${c.whyItMatters}</div>` : ''}<div>${c.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div><div class="prog" style="color:#555">Coming soon</div></div>`;
       const p = getCourseProgress(c);
-      return `<div class="course-card" data-ci="${i}"><h3>${c.title}</h3><div class="desc">${c.description}</div><div>${c.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div><div class="prog">${p.done}/${p.total} mastered (${p.pct}%)</div></div>`;
+      return `<div class="course-card" data-ci="${i}"><h3>${c.title}</h3><div class="desc">${c.description}</div>${c.whyItMatters ? `<div class="why-matters">${c.whyItMatters}</div>` : ''}<div>${c.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div><div class="prog">${p.done}/${p.total} mastered (${p.pct}%)</div></div>`;
     }).join("")}</div>`;
   el.querySelectorAll("[data-ci]").forEach(e => e.addEventListener("click", () => showCourse(parseInt(e.dataset.ci))));
 }
@@ -72,12 +143,14 @@ async function showCourse(ci) {
   const el = document.getElementById("view-course");
   el.innerHTML = `<div class="breadcrumb"><a onclick="showHome()">Courses</a> / ${currentCourse.title}</div>
     <h2 style="font-size:1.4rem;color:#fff;margin-bottom:0.25rem">${currentCourse.title}</h2>
-    <p style="color:#888;margin-bottom:1.5rem">${currentCourse.description}</p>
+    <p style="color:#888;margin-bottom:0.5rem">${currentCourse.description}</p>
+    ${currentCourse.whyItMatters ? `<p class="why-matters" style="margin-bottom:1.5rem">${currentCourse.whyItMatters}</p>` : ''}
     <div class="set-list">${quiz.sets.map((s, si) => {
       const b = best[si];
       const mastered = b >= 8;
+      const stopped = state.stoppedAt[`${currentCourse.id}-${si}`];
       return `<div class="set-item" data-si="${si}">
-        <div><h3>Set ${s.set_number}: ${s.title}</h3><div class="set-meta">${s.questions.length} questions</div></div>
+        <div><h3>Set ${s.set_number}: ${s.title}</h3><div class="set-meta">${s.questions.length} questions${stopped ? ` · stopped at ${stopped}` : ''}</div></div>
         <div class="set-status">
           ${b !== undefined ? `<div class="set-score">${b}/10</div>` : ''}
           ${mastered ? '<div class="set-badge mastered">Mastered</div>' : b !== undefined ? '<div class="set-badge">Attempted</div>' : ''}
@@ -90,6 +163,7 @@ async function showCourse(ci) {
 function showSetPreview(ci, si) {
   const quiz = quizCache[currentCourse.id];
   currentSet = quiz.sets[si];
+  currentSetIdx = si;
   showView("view-set");
   const el = document.getElementById("view-set");
   el.innerHTML = `<div class="breadcrumb"><a onclick="showHome()">Courses</a> / <a onclick="showCourse(${ci})">${currentCourse.title}</a> / Set ${currentSet.set_number}</div>
@@ -111,6 +185,7 @@ function showVideo(ci, si) {
   showView("view-video");
   const ts = currentCourse.timestamps[si] || { start: 0, end: 600 };
   const noteKey = `${currentCourse.id}-set${si}`;
+  const stoppedKey = `${currentCourse.id}-${si}`;
   const el = document.getElementById("view-video");
   el.innerHTML = `<div class="breadcrumb"><a onclick="showHome()">Courses</a> / <a onclick="showCourse(${ci})">${currentCourse.title}</a> / <a onclick="showSetPreview(${ci},${si})">Set ${currentSet.set_number}</a> / Video</div>
     <div class="video-container">
@@ -121,6 +196,10 @@ function showVideo(ci, si) {
       <div class="time" id="vid-time">10:00</div>
       <p>Watch the video, then take the quiz</p>
     </div>
+    <div class="stopped-at">
+      <label>I stopped watching at:</label>
+      <input type="text" id="stopped-input" placeholder="e.g. 23:45" value="${state.stoppedAt[stoppedKey] || ''}">
+    </div>
     <div class="notes-area">
       <h3>Notes</h3>
       <textarea id="vid-notes" placeholder="Jot down key concepts...">${esc(state.notes[noteKey] || "")}</textarea>
@@ -128,13 +207,15 @@ function showVideo(ci, si) {
     <button class="ready-btn" id="ready-btn">I'm Ready — Start Quiz</button>
     <button class="skip-btn" id="skip-btn">Skip to Quiz</button>`;
 
-  // Save notes
   el.querySelector("#vid-notes").addEventListener("input", (e) => {
     state.notes[noteKey] = e.target.value;
     chrome.storage.local.set({ videoNotes: state.notes });
   });
+  el.querySelector("#stopped-input").addEventListener("input", (e) => {
+    state.stoppedAt[stoppedKey] = e.target.value;
+    chrome.storage.local.set({ stoppedAt: state.stoppedAt });
+  });
 
-  // Timer
   videoTimeLeft = VIDEO_TIMER;
   clearInterval(videoTimer);
   updateVideoTimer();
@@ -160,10 +241,11 @@ function updateVideoTimer() {
   el.className = videoTimeLeft <= 60 ? "time warning" : "time";
 }
 
-// === QUIZ (Kahoot) ===
+// === QUIZ ===
 function startQuiz(ci, si) {
   showView("view-quiz");
   currentQIdx = 0; quizScore = 0; quizStreak = 0; quizCorrect = 0; quizTotal = currentSet.questions.length;
+  recordStudyDay();
   showQuestion(ci, si);
 }
 
@@ -236,14 +318,26 @@ function quizAnswer(chosen, ci, si) {
 async function showResults(ci, si) {
   showView("view-results");
   const pct = Math.round(quizCorrect / quizTotal * 100);
+  const q = randomQuote();
+  const project = (PROJECT_PROMPTS[currentCourse.id] || [])[si] || "Write a short post about what you learned today";
+  const tweetText = encodeURIComponent(`Just studied "${currentSet.title}" — building technical intuition one set at a time.\n\n${quizCorrect}/${quizTotal} on the quiz.\n\nKey insight: [fill in yours]\n\n#BuildInPublic #LearningInPublic`);
+
   const el = document.getElementById("view-results");
   el.innerHTML = `<div class="results-card">
-    <h2>${pct >= 80 ? "Amazing!" : pct >= 50 ? "Good effort!" : "Keep studying!"}</h2>
+    <h2>${pct >= 80 ? "You showed up and crushed it." : pct >= 50 ? "You showed up. That's what matters." : "You showed up. Come back tomorrow."}</h2>
     <div class="final-score">${quizScore}</div>
     <div class="detail">${quizCorrect}/${quizTotal} correct (${pct}%)${pct >= 80 ? " — Set mastered!" : ""}</div>
-    <button id="res-retry">Retry</button>
-    <button id="res-course" class="secondary">Back to Course</button>
-    <button id="res-home" class="secondary">All Courses</button>
+    <div class="quote-block"><p>"${q.text}"</p><span>— ${q.by}</span></div>
+    <div class="project-prompt">
+      <h3>Show Your Work</h3>
+      <p>${esc(project)}</p>
+    </div>
+    <a class="tweet-btn" href="https://twitter.com/intent/tweet?text=${tweetText}" target="_blank">Share on Twitter</a>
+    <div style="margin-top:1rem">
+      <button id="res-retry">Retry</button>
+      <button id="res-course" class="secondary">Back to Course</button>
+      <button id="res-home" class="secondary">All Courses</button>
+    </div>
   </div>`;
 
   el.querySelector("#res-retry").addEventListener("click", () => startQuiz(ci, si));
@@ -252,14 +346,12 @@ async function showResults(ci, si) {
 
   if (pct >= 80) fireConfetti();
 
-  // Save best
   if (!state.best[currentCourse.id]) state.best[currentCourse.id] = {};
   if (!state.best[currentCourse.id][si] || quizCorrect > state.best[currentCourse.id][si]) {
     state.best[currentCourse.id][si] = quizCorrect;
   }
   chrome.storage.local.set({ quizBest: state.best });
 
-  // XP
   const xp = quizCorrect * 5;
   if (xp > 0) {
     state.xp += xp;
